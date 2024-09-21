@@ -6,7 +6,7 @@ export const updateUserPurchases: AfterChangeHook<Order> = async ({ doc, req, op
   const { payload } = req
 
   if ((operation === 'create' || operation === 'update') && doc.orderedBy && doc.items) {
-    const orderedBy = typeof doc.orderedBy === 'object' ? doc.orderedBy.id : doc.orderedBy
+    const orderedBy = typeof doc.orderedBy === 'string' ? doc.orderedBy : doc.orderedBy.id
 
     const user = await payload.findByID({
       collection: 'users',
@@ -20,10 +20,10 @@ export const updateUserPurchases: AfterChangeHook<Order> = async ({ doc, req, op
         data: {
           purchases: [
             ...(user?.purchases?.map(purchase =>
-              typeof purchase === 'object' ? purchase.id : purchase,
+              typeof purchase === 'string' ? purchase : purchase.id,
             ) || []), // eslint-disable-line function-paren-newline
             ...(doc?.items?.map(({ product }) =>
-              typeof product === 'object' ? product.id : product,
+              typeof product === 'string' ? product : product.id,
             ) || []), // eslint-disable-line function-paren-newline
           ],
         },
